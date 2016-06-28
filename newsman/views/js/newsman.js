@@ -39,9 +39,12 @@
         mapping = newsman.mapping;
         ajaxURL = newsman.ajaxURL;
         strings = newsman.strings;
+        msg = newsman.msg;
 
-        if (data)
+        if (data) {
             $(updateSelectsLoop(data));
+            $(UpdateMessage(msg))
+        }
 
         $('#sel_list').change(function () {
             var $me = $(this);
@@ -80,6 +83,23 @@
                 $(this).val(mapping[$(this).attr('name')]);
                 if ($(this).val() == null) $(this).val('');
             })
+        }
+    }
+
+    function UpdateMessage(type) {
+        switch (type) {
+            case 1:
+                $('#connectNewsmanMsg').css("display", "block");
+                break;
+            case 2:
+                $('#refreshSegmentsMsg').css("display", "block");
+                break;
+            case 3:
+                $('#saveMappingMsg').css("display", "block");
+                break;
+            case 4:
+                $('#syncMsg').css("display", "block");
+                break;
         }
     }
 

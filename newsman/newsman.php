@@ -25,6 +25,8 @@ class Newsman extends Module
 {
 	//strings
 	private $apiKey, $userId, $listId;
+	//int
+	private $msgType;
 	//boolean
 	private $flagSaveMapping;
 
@@ -68,6 +70,7 @@ class Newsman extends Module
 		$out = '';
 		if (Tools::isSubmit('submitOptionsconfiguration'))
 		{
+			$this->msgType = 1;
 			$data = array();
 
 			Configuration::updateValue('NEWSMAN_CONNECTED', 0);
@@ -118,6 +121,7 @@ class Newsman extends Module
 
 		} elseif (Tools::isSubmit('submitOptionsConfigurationRefresh'))
 		{
+			$this->msgType = 2;
 			$data = array();
 
 			Configuration::updateValue('NEWSMAN_CONNECTED', 0);
@@ -265,6 +269,7 @@ class Newsman extends Module
 	<legend>' . $this->l('API SETTINGS') . '</legend>';
 		$out .= '<br /><br />
 	<br class="clear" />
+	<div id="connectNewsmanMsg" class="conf" style="display:none;">Connected to newsman successfully.</div>
 	<label for="api_key">' . $this->l('API KEY') . '</label>
 	<div class="margin-form">
 <input type="text" name="api_key" id="api_key" class="" value="' . $this->apiKey . '" size="40" required="required">
@@ -287,6 +292,8 @@ class Newsman extends Module
 	<legend>' . $this->l('SYNCHRONIZATION MAPPING') . '</legend>';
 		$out .= '<br /><br />
 	<br class="clear" />
+	<div id="refreshSegmentsMsg" class="conf" style="display:none;">Newsman segments refreshed successfully.</div>
+	<div id="saveMappingMsg" class="conf" style="display:none;">Data has been mapped successfully for synchronization.</div>
 	<label for="sel_list">' . $this->l('Newsman list') . '</label>
 	<div class="margin-form">
 <select name="sel_list" class="fixed-width-xl" id="sel_list"></select>
@@ -304,6 +311,7 @@ class Newsman extends Module
 
 		if (Tools::isSubmit('submitSaveMapping'))
 		{
+			$this->msgType = 3;
 			$mapOptions['list'] = $_POST['sel_list'];
 			$mapOptions['map_newsletter'] = $_POST['map_newsletter'];
 		}
@@ -348,6 +356,7 @@ class Newsman extends Module
 	<legend>' . $this->l('AUTOMATIC SYNCHRONIZATION') . '</legend>';
 		$out .= '<br /><br />
 	<br class="clear" />
+	<div id="syncMsg" class="conf" style="display:none;">Data has been synchronized successfully.</div>
 	<label for="sel_list">' . $this->l('Automatic synchronization') . '</label>
 	<div class="margin-form">
 <select name="cron_option" class=" fixed-width-xl" id="cron_option">
@@ -370,6 +379,11 @@ class Newsman extends Module
 
 		//the script
 
+		if (Tools::isSubmit('submitSynchronizeBtn'))
+		{
+			$this->msgType = 4;
+		}
+
 		$this->context->controller->addJS($this->_path . 'views/js/newsman.js');
 
 		$ajaxURL = $this->context->link->getAdminLink('AdminModules') . '&configure=' . $this->name;
@@ -382,6 +396,7 @@ class Newsman extends Module
 		$mapping = Configuration::get('NEWSMAN_MAPPING');
 
 		$out .= '<script>var newsman=' . Tools::jsonEncode(array(
+				'msg' => $this->msgType,
 				'data' => $data ? Tools::jsonDecode($data) : false,
 				'mapExtra' => $mapExtra,
 				'mapping' => $mapping ? Tools::jsonDecode($mapping) : false,
