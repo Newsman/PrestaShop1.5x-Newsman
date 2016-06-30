@@ -170,7 +170,7 @@ class Newsman extends Module
 				}
 			}
 
-		} elseif (Tools::isSubmit('submitOptionsconfiguration'))
+		} elseif (Tools::isSubmit('submitSaveCronBtn'))
 		{
 			$this->SaveCron();
 		}
@@ -210,7 +210,6 @@ class Newsman extends Module
 		$default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
 		$helper->default_form_language = $default_lang;
 		$helper->allow_employee_form_lang = $default_lang;
-
 
 		$mappingSection = array(
 			array(
@@ -263,6 +262,8 @@ class Newsman extends Module
 
 		$out = '<div id="newsman-msg"></div>';
 
+		/*
+
 		$out .= '
 <form action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 <fieldset>
@@ -285,6 +286,86 @@ class Newsman extends Module
 	<br class="clear" />
 </fieldset>
 </form>';
+
+		*/
+
+		$out .= $helper->generateForm(array(
+			array('form' => array(
+				'legend' => array(
+					'title' => $this->l('API Settings'),
+					'icon' => 'icon-cogs'
+				),
+				'input' => array(
+					array(
+						'type' => 'text',
+						'label' => $this->l('API KEY'),
+						'name' => 'api_key',
+						'size' => 40,
+						'required' => true
+					),
+					array(
+						'type' => 'text',
+						'label' => $this->l('User ID'),
+						'name' => 'user_id',
+						'size' => 40,
+						'required' => true
+					)
+				),
+				'buttons' => array(
+					array(
+						'title' => 'Connect',
+						'class' => 'pull-right',
+						'icon' => $connected ? 'process-icon-ok' : 'process-icon-next',
+						'js' => 'connectAPI(this)'
+					)
+				)
+			))));
+
+		$out .= '
+<form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
+	<br class="clear" />
+<div id="connectNewsmanMsg" class="conf" style="display:none;">Connected to newsman successfully.</div>
+	<div class="margin-form">
+	   <input type="submit" class="btn btn-default pull-right" name="submitOptionsconfiguration" value="' . $this->l('Connect') . '"><i class="process-icon-ok"></i></input>
+	</div>
+	<br class="clear" />
+</form>';
+
+		$out .= $helper->generateForm(array(array('form' => array(
+			'legend' => array(
+				'title' => $this->l('Synchronization mapping')
+			),
+			'input' => $mappingSection,
+			'buttons' => array(
+				array(
+					'title' => $this->l('Save mapping'),
+					'class' => 'pull-right',
+					'icon' => 'process-icon-save',
+					'js' => 'saveMapping(this)'
+				),
+				array(
+					'title' => $this->l('Refresh segments'),
+					'icon' => 'process-icon-refresh',
+					'js' => 'connectAPI(this)'
+				)
+			)
+		))));
+
+		$out .= '
+<form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
+<br class="clear" />
+	<div id="saveMappingMsg" class="conf" style="display:none;">Data has been mapped successfully for synchronization.</div>
+<div class="margin-form">
+  <input type="submit" class="btn btn-default pull-right" name="submitOptionsConfigurationRefresh" value="' . $this->l('Refresh Segments') . '"><i class="process-icon-ok"></i></input>
+	  <input type="submit" class="btn btn-default pull-right" name="submitSaveMapping" value="' . $this->l('Save mapping') . '"><i class="process-icon-ok"></i></input>
+	</div>
+	<br class="clear" />
+	<input type="hidden" name="HUserId" id="HUserId" class="" value="' . $this->userId . '" size="40" required="required">
+	<input type="hidden" name="hApi_key" id="hApi_key" class="" value="' . $this->apiKey . '" size="40" required="required">
+</form>';
+
+
+		/*
 
 		$out .= '
 <form action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
@@ -350,13 +431,66 @@ class Newsman extends Module
 </fieldset>
 </form>';
 
+		*/
+
+		//AUTOMATIC SYNCHRONIZATION
+
+		$out .= $helper->generateForm(array(array('form' => array(
+			'legend' => array(
+				'title' => $this->l('Automatic synchronization')
+			),
+			'input' => array(
+				array(
+					'label' => 'Automatic synchronization',
+					'type' => 'select',
+					'name' => 'cron_option',
+					'options' => array(
+						'query' => array(
+							array('value' => '', 'label' => $this->l('never (disabled)')),
+							array('value' => 'd', 'label' => $this->l('every day')),
+							array('value' => 'w', 'label' => $this->l('every week')),
+						),
+						'id' => 'value',
+						'name' => 'label'
+					)
+				)
+			),
+			'buttons' => array(
+				array(
+					'title' => $this->l('Synchronize now'),
+					'icon' => 'process-icon-next',
+					'js' => 'synchronizeNow(this)'
+				),
+				array(
+					'title' => $this->l('Save option'),
+					'icon' => 'process-icon-save',
+					'class' => 'pull-right',
+					'js' => 'saveCron(this)'
+				),
+
+			)
+		))));
+
+		$out .= '
+<form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
+<br class="clear" />
+<div id="syncMsg" class="conf" style="display:none;">Users uploaded and scheduled for import. It might take a few minutes until they show up in your Newsman lists.</div>
+	<div class="margin-form">
+	  <input type="submit" class="btn btn-default" name="submitSynchronizeBtn" value="Synchronize now"/>
+	  <input type="submit" class="btn btn-default pull-right" name="submitSaveCronBtn" value="Save Options"/>
+	</div>
+	<br class="clear" />
+</form>';
+
+		/*
+
 		$out .= '
 <form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 <fieldset>
 	<legend>' . $this->l('AUTOMATIC SYNCHRONIZATION') . '</legend>';
 		$out .= '<br /><br />
 	<br class="clear" />
-	<div id="syncMsg" class="conf" style="display:none;">Data has been synchronized successfully.</div>
+	<div id="syncMsg" class="conf" style="display:none;">Users uploaded and scheduled for import. It might take a few minutes until they show up in your Newsman lists.</div>
 	<label for="sel_list">' . $this->l('Automatic synchronization') . '</label>
 	<div class="margin-form">
 <select name="cron_option" class=" fixed-width-xl" id="cron_option">
@@ -371,11 +505,13 @@ class Newsman extends Module
 	<br class="clear" />
 	<div class="margin-form">
 	  <input type="submit" class="btn btn-default" name="submitSynchronizeBtn" value="Synchronize now"/>
-	  <input type="submit" class="btn btn-default pull-right" name="submitOptionsconfiguration" value="Save Options"/>
+	  <input type="submit" class="btn btn-default pull-right" name="submitSaveCronBtn" value="Save Options"/>
 	</div>
 	<br class="clear" />
 </fieldset>
 </form>';
+
+		*/
 
 		//the script
 
