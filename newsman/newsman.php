@@ -172,11 +172,16 @@ class Newsman extends Module
 
 		} elseif (Tools::isSubmit('submitSaveCronBtn'))
 		{
-			$this->SaveCron();
+			if ($this->SaveCron())
+			{
+				$this->msgType = 5;
+			} else
+			{
+				$this->msgType = 6;
+			}
 		}
 
 		$connected = Configuration::get('NEWSMAN_CONNECTED');
-
 
 		$helper = new HelperForm();
 
@@ -201,11 +206,13 @@ class Newsman extends Module
 		$helper->submit_action = 'submit' . $this->name;
 
 		// Load current value
+
+		/*
 		$helper->fields_value['api_key'] = Configuration::get('NEWSMAN_API_KEY');
 		$helper->fields_value['user_id'] = Configuration::get('NEWSMAN_USER_ID');
 		$helper->fields_value['cron_url'] = $this->context->shop->getBaseURL() . 'modules/newsman/cron_task.php';
 		$helper->fields_value['cron_option'] = Configuration::get('NEWSMAN_CRON');
-
+		*/
 
 		$default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
 		$helper->default_form_language = $default_lang;
@@ -262,8 +269,6 @@ class Newsman extends Module
 
 		$out = '<div id="newsman-msg"></div>';
 
-		/*
-
 		$out .= '
 <form action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 <fieldset>
@@ -287,40 +292,41 @@ class Newsman extends Module
 </fieldset>
 </form>';
 
-		*/
+		/*HELPER FORM METHOD
+				$out .= $helper->generateForm(array(
+					array('form' => array(
+						'legend' => array(
+							'title' => $this->l('API Settings'),
+							'icon' => 'icon-cogs'
+						),
+						'input' => array(
+							array(
+								'type' => 'text',
+								'label' => $this->l('API KEY'),
+								'name' => 'api_key',
+								'size' => 40,
+								'required' => true
+							),
+							array(
+								'type' => 'text',
+								'label' => $this->l('User ID'),
+								'name' => 'user_id',
+								'size' => 40,
+								'required' => true
+							)
+						),
+						'buttons' => array(
+							array(
+								'title' => 'Connect',
+								'class' => 'pull-right',
+								'icon' => $connected ? 'process-icon-ok' : 'process-icon-next',
+								'js' => 'connectAPI(this)'
+							)
+						)
+					))));
+				HELPER FORM METHOD*/
 
-		$out .= $helper->generateForm(array(
-			array('form' => array(
-				'legend' => array(
-					'title' => $this->l('API Settings'),
-					'icon' => 'icon-cogs'
-				),
-				'input' => array(
-					array(
-						'type' => 'text',
-						'label' => $this->l('API KEY'),
-						'name' => 'api_key',
-						'size' => 40,
-						'required' => true
-					),
-					array(
-						'type' => 'text',
-						'label' => $this->l('User ID'),
-						'name' => 'user_id',
-						'size' => 40,
-						'required' => true
-					)
-				),
-				'buttons' => array(
-					array(
-						'title' => 'Connect',
-						'class' => 'pull-right',
-						'icon' => $connected ? 'process-icon-ok' : 'process-icon-next',
-						'js' => 'connectAPI(this)'
-					)
-				)
-			))));
-
+		/*HELPER FORM METHOD
 		$out .= '
 <form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 	<br class="clear" />
@@ -330,7 +336,9 @@ class Newsman extends Module
 	</div>
 	<br class="clear" />
 </form>';
+		HELPER FORM METHOD*/
 
+		/*HELPER FORM METHOD
 		$out .= $helper->generateForm(array(array('form' => array(
 			'legend' => array(
 				'title' => $this->l('Synchronization mapping')
@@ -350,7 +358,9 @@ class Newsman extends Module
 				)
 			)
 		))));
+		HELPER FORM METHOD*/
 
+		/*HELPER FORM METHOD
 		$out .= '
 <form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 <br class="clear" />
@@ -363,9 +373,7 @@ class Newsman extends Module
 	<input type="hidden" name="HUserId" id="HUserId" class="" value="' . $this->userId . '" size="40" required="required">
 	<input type="hidden" name="hApi_key" id="hApi_key" class="" value="' . $this->apiKey . '" size="40" required="required">
 </form>';
-
-
-		/*
+		HELPER FORM METHOD*/
 
 		$out .= '
 <form action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
@@ -431,10 +439,9 @@ class Newsman extends Module
 </fieldset>
 </form>';
 
-		*/
-
 		//AUTOMATIC SYNCHRONIZATION
 
+		/*HELPER METHOD
 		$out .= $helper->generateForm(array(array('form' => array(
 			'legend' => array(
 				'title' => $this->l('Automatic synchronization')
@@ -470,7 +477,9 @@ class Newsman extends Module
 
 			)
 		))));
+		HELPER METHOD*/
 
+		/*HELPER METHOD
 		$out .= '
 <form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 <br class="clear" />
@@ -481,8 +490,8 @@ class Newsman extends Module
 	</div>
 	<br class="clear" />
 </form>';
+		HELPER METHOD*/
 
-		/*
 
 		$out .= '
 <form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
@@ -491,6 +500,9 @@ class Newsman extends Module
 		$out .= '<br /><br />
 	<br class="clear" />
 	<div id="syncMsg" class="conf" style="display:none;">Users uploaded and scheduled for import. It might take a few minutes until they show up in your Newsman lists.</div>
+	<div id="cronSync" class="conf" style="display:none;">Automatic synchronization option saved.</div>
+	<div id="cronSyncFail" class="conf" style="display:none;">To enable automatic synchronization you need to install ' .
+			'and configure "Cron tasks manager" module from PrestaShop.</div>
 	<label for="sel_list">' . $this->l('Automatic synchronization') . '</label>
 	<div class="margin-form">
 <select name="cron_option" class=" fixed-width-xl" id="cron_option">
@@ -510,8 +522,6 @@ class Newsman extends Module
 	<br class="clear" />
 </fieldset>
 </form>';
-
-		*/
 
 		//the script
 
@@ -711,11 +721,14 @@ class Newsman extends Module
 
 	public function SaveCron()
 	{
-		$option = Tools::getValue('option');
+		$flag = false;
+
+		$option = Tools::getValue('cron_option');
 		if (!$option || Module::isInstalled('cronjobs') && function_exists('curl_init'))
 		{
-			$this->jsonOut(array('msg' => $this->displayConfirmation($this->l('Automatic synchronization option saved.'))));
+			//$this->jsonOut(array('msg' => $this->displayConfirmation($this->l('Automatic synchronization option saved.'))));
 			Configuration::updateValue('NEWSMAN_CRON', $option);
+			$flag = true;
 			if ($option)
 			{
 				$this->registerHook('actionCronJob');
@@ -727,7 +740,7 @@ class Newsman extends Module
 		{
 			$this->unregisterHook('actionCronJob');
 			Configuration::updateValue('NEWSMAN_CRON', '');
-			$this->jsonOut(
+			/*$this->jsonOut(
 				array(
 					'fail' => true,
 					'msg' => $this->displayError(
@@ -738,7 +751,9 @@ class Newsman extends Module
 					)
 				)
 			);
+			*/
 		}
+		return $flag;
 	}
 
 	public function getCronFrequency()

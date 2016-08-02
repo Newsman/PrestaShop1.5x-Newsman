@@ -87,6 +87,7 @@
     }
 
     function UpdateMessage(type) {
+        console.log(type + " sasada");
         switch (type) {
             case 1:
                 $('#connectNewsmanMsg').css("display", "block");
@@ -99,6 +100,12 @@
                 break;
             case 4:
                 $('#syncMsg').css("display", "block");
+                break;
+            case 5:
+                $('#cronSync').css("display", "block");
+                break;
+            case 6:
+                $('#cronSyncFail').css("display", "block");
                 break;
         }
     }
