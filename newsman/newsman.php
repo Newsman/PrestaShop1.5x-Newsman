@@ -129,6 +129,7 @@ class Newsman extends Module
 
 			$this->apiKey = Tools::getValue('hApi_key');
 			$this->userId = Tools::getValue('HUserId');
+			$this->listId = Tools::getValue('sel_list');
 
 			if (!Validate::isGenericName($this->apiKey) || $this->apiKey == '')
 			{
@@ -152,7 +153,7 @@ class Newsman extends Module
 					$data['msg'][] = $this->displayConfirmation($this->l('Connected. Please choose the synchronization details below.'));
 					$data['ok'] = true;
 					//get segments for the first list
-					$this->listId = $data['lists'][0]['list_id'];
+					//$this->listId = $data['lists'][0]['list_id'];
 					$client->query('segment.all', $this->listId);
 					$data['segments'] = $client->getResponse();
 					//save lists and segments

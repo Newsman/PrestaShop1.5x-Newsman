@@ -46,7 +46,7 @@
             $(UpdateMessage(msg))
         }
 
-        $('#sel_list').change(function () {
+       /* $('#sel_list').change(function () {
             var $me = $(this);
             var $ld = $('<i class="process-icon-loading" style="display: inline-block"/>');
             $me.css({display: 'inline-block'}).after($ld);
@@ -57,6 +57,7 @@
                 $ld.remove();
             });
         })
+        */
     });
 
     function updateSelectsLoop(object) {
