@@ -7,6 +7,7 @@ Generate an API KEY in your [Newsman](https://www.newsmanapp.com) account, insta
 #Installation
 Manual installation:
 Copy the "newsman" directory from this repository to your "modules" shop directory.
+Copy "newsmanfetch.php" to your root directory.
 
 #Setup
 1. Fill in your Newsman API KEY and User ID and click connect
