@@ -23,6 +23,11 @@ For the segments to show up in this form, you need to set them up in your Newsma
 You can also do a manual synchronization by clicking "Synchronize now".
 ![](https://raw.githubusercontent.com/Newsman/PrestaShop1.5x-Newsman/master/assets/sync-screen.png)
 
+# Sync Segmentation
+
+- Newsletter subscribers: email, newsletter_date_add, source
+- Customer groups: email, firstname, lastname, gender
+
 For the automatic synchronization to work, you need to have the "native" "Cron tasks manager" (cronjobs) module installed and configured.
 
 

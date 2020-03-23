@@ -66,7 +66,7 @@ class Newsman extends Module
 	}
 
 	public function getContent()
-	{
+	{		
 		$out = '';
 		if (Tools::isSubmit('submitOptionsconfiguration'))
 		{
@@ -789,22 +789,28 @@ class Newsman extends Module
 		$count = 0;
 		//newsletter
 		$value = $mapping['map_newsletter'];
-		if ($value && Module::isInstalled('blocknewsletter'))
+		if (Module::isInstalled('blocknewsletter'))
 		{
 			$dbq = new DbQuery();
-			$q = $dbq->select('`email`')
+			$q = $dbq->select('`email`,`newsletter_date_add`')
 				->from('newsletter')
 				->where('`active` = 1');
 			$ret = Db::getInstance()->executeS($q->build());
 			$count += count($ret);
-			$header = "email,prestashop_source";
+			$header = "email,newsletter_date_add,source";
 			$lines = array();
 			foreach ($ret as $row)
 			{
-				$lines[] = "{$row['email']},newsletter";
+				$lines[] = "{$row['email']},{$row['newsletter_date_add']},prestashop newsletter";
 			}
+
 			//upload from newsletter
 			$segment_id = Tools::substr($mapping['map_newsletter'], 0, 4) == 'seg_' ? Tools::substr($mapping['map_newsletter'], 4) : null;
+
+			if(empty($segment_id)){
+				$segment_id = array();
+			}
+
 			$this->exportCSV($client, $list_id, array($segment_id), $header, $lines);
 		}
 		foreach ($mapping as $key => $value)
@@ -819,7 +825,7 @@ class Newsman extends Module
 			}
 			$id_group = (int)(Tools::substr($key, 10));
 			$dbq = new DbQuery();
-			$q = $dbq->select('c.email, c.firstname, c.lastname')
+			$q = $dbq->select('c.email, c.firstname, c.lastname, c.id_gender')
 				->from('customer', 'c')
 				->leftJoin('customer_group', 'cg', 'cg.id_customer=c.id_customer')
 				->where('cg.id_group=' . $id_group);
@@ -828,7 +834,13 @@ class Newsman extends Module
 			{
 				$count += count($ret);
 				$cols = array_keys($ret[0]);
-				$header = join(',', $cols) . ",prestashop_source";
+				 //rename id_gender
+				 $cols[3] = "gender";
+			
+				 $header = join(',', $cols) . ",source";
+
+				//rename gender again to be filtered
+				$cols[3] = "id_gender";
 
 				$lines = array();
 				foreach ($ret as $row)
@@ -836,10 +848,19 @@ class Newsman extends Module
 					$line = '';
 					foreach ($cols as $col)
 					{
+						if ($col == "id_gender") {
+                            if ($row[$col] == "1") {
+                                $row[$col] = "Barbat";
+                            } else if ($row[$col] == "2") {
+                                $row[$col] = "Femeie";
+                            }
+                        }
+
 						$line .= $row[$col] . ',';
 					}
-					$lines[] = "$line,group_{$id_group}";
-				}
+					$lines[] = "$line prestashop group_{$id_group}";
+				}	
+
 				//upload group
 				$segment_id = Tools::substr($value, 0, 4) == 'seg_' ? Tools::substr($value, 4) : null;
 				$this->exportCSV($client, $list_id, array($segment_id), $header, $lines);
@@ -854,8 +875,8 @@ class Newsman extends Module
 		for ($i = 0; $i < count($lines); $i += $max)
 		{
 			$a = array_slice($lines, $i, $max);
-			array_unshift($a, $header);
-			$client->query('import.csv', $list_id, $segments, join("\n", $a));
+			array_unshift($a, $header);		
+			$res = $client->query('import.csv', $list_id, $segments, join("\n", $a));		
 		}
 	}
 }
