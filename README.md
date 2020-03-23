@@ -26,7 +26,7 @@ You can also do a manual synchronization by clicking "Synchronize now".
 # Sync Segmentation
 
 - Newsletter subscribers: email, newsletter_date_add, source
-- Customer groups: email, firstname, lastname, gender
+- Customer groups: email, firstname, lastname, gender, source
 
 For the automatic synchronization to work, you need to have the "native" "Cron tasks manager" (cronjobs) module installed and configured.
 
