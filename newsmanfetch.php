@@ -50,15 +50,20 @@ if (!empty($newsman) && !empty($apikey)) {
 
                 foreach ($products as $prod) {
                     $productsJson[] = array(
-                        "id" => $prod['product_id'],
+                        "id" => $prod['id_product'],
                         "name" => $prod['product_name'],
                         "quantity" => $prod['product_quantity'],
-                        "price" => $prod['product_price']
+                        "price" => $prod['product_price'],
+                        "price_old" => 0,
+                        "image_url" => "",
+                        "url" => ""
                     );
                 }
 
                 $ordersObj[] = array(
                     "order_no" => $item["id_order"],
+                    "date" => "",
+                    "status" => "",
                     "lastname" => $cust["firstname"],
                     "firstname" => $cust["firstname"],
                     "email" => $cust["email"],
@@ -93,11 +98,15 @@ if (!empty($newsman) && !empty($apikey)) {
             $productsJson = array();
 
             foreach ($products as $prod) {
+
                 $productsJson[] = array(
-                    "id" => $prod["product_id"],
+                    "id" => $prod["id_product"],
                     "name" => $prod["name"],
                     "stock_quantity" => $prod["quantity"],
-                    "price" => $prod["price"]
+                    "price" => $prod["price"],
+                    "price_old" => 0,
+                    "image_url" => "",
+                    "url" => ""
                 );
             }
 
@@ -155,6 +164,17 @@ if (!empty($newsman) && !empty($apikey)) {
             return;
 
             break;
+        case "version.json":
+            $version = array(
+            "version" => "Prestashop 1.5"
+            );
+
+            header('Content-Type: application/json');
+            echo json_encode($version, JSON_PRETTY_PRINT);
+            return;
+    
+            break;
+    
     }
 } else {
     http_response_code(403);
