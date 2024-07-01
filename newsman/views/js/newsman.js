@@ -88,7 +88,7 @@
     }
 
     function UpdateMessage(type) {
-        console.log(type + " sasada");
+
         switch (type) {
             case 1:
                 $('#connectNewsmanMsg').css("display", "block");

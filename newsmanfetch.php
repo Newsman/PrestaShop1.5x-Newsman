@@ -4,11 +4,11 @@ require(dirname(__FILE__) . '/config/config.inc.php');
 
 $_apikey = Configuration::get('NEWSMAN_API_KEY');
 
-$apikey = (empty($_GET["apikey"])) ? "" : $_GET["apikey"];
+$apikey = (empty($_GET["nzmhash"])) ? "" : $_GET["nzmhash"];
 $newsman = (empty($_GET["newsman"])) ? "" : $_GET["newsman"];
 
 if (!empty($newsman) && !empty($apikey)) {
-    $apikey = $_GET["apikey"];
+    $apikey = $_GET["nzmhash"];
     $currApiKey = $_apikey;
 
     if ($apikey != $currApiKey) {

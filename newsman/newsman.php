@@ -17,8 +17,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @author    Dramba Victor for Newsman
- * @copyright 2015 Dazoot Software
+ * @author    NewsMAN
+ * @copyright Dazoot Software
  * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 class Newsman extends Module
@@ -182,6 +182,8 @@ class Newsman extends Module
 			}
 		}
 
+		$this->isOauth($data);
+
 		$connected = Configuration::get('NEWSMAN_CONNECTED');
 
 		$helper = new HelperForm();
@@ -269,7 +271,86 @@ class Newsman extends Module
 
 
 		$out = '<div id="newsman-msg"></div>';
+		
+		if($data["isOauth"])
+		{
+		// isOauth
+		$out .= '
+<div id="contentOauth">
 
+	<!-- oauth step -->
+	';
+if ($data["oauthStep"] == 1) {
+	$out .= '
+	<form method="post" enctype="multipart/form-data">
+		<input type="hidden" name="newsman_oauth" value="Y"/>
+		<input type="hidden" name="step" value="1"/>
+		<table class="form-table newsmanTable newsmanTblFixed newsmanOauth">
+			<tr>
+				<td>
+					<p class="description"><b>Connect your site with NewsMAN for:</b></p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p class="description">- Subscribers Sync</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p class="description">- Ecommerce Remarketing</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p class="description">- Create and manage forms</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p class="description">- Create and manage popups</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p class="description">- Connect your forms to automation</p>
+				</td>
+			</tr>
+		</table>
+		<div style="padding-top: 5px;">
+			<a style="background: #ad0100; color: #fff;" href="' . $data["oauthUrl"] . '" class="button button-primary btn btn-primary">Login with NewsMAN</a>
+		</div>
+	</form>';
+} elseif ($data["oauthStep"] == 2) {
+	$out .= '
+	<form method="post" enctype="multipart/form-data">
+		<input type="hidden" name="oauthstep2" value="Y"/>
+		<input type="hidden" name="step" value="1"/>
+		<input type="hidden" name="creds" value="' . htmlspecialchars($data["creds"], ENT_QUOTES, "UTF-8") . '" />
+		<table class="form-table newsmanTable newsmanTblFixed newsmanOauth">
+			<tr>
+				<td>
+					<select name="newsman_list" id="">
+						<option value="0">-- select list --</option>';
+	foreach ($data["dataLists"] as $list) {
+		$out .= '<option value="' . htmlspecialchars($list['list_id']) . '">' . htmlspecialchars($list['list_name']) . '</option>';
+	}
+	$out .= '					</select>
+				</td>
+			</tr>
+		</table>
+		<div style="padding-top: 5px;">
+			<button type="submit" style="background: #ad0100; color: #fff;" class="button button-primary btn btn-primary">Save</button>
+		</div>
+	</form>';
+}
+$out .= '
+
+</div>
+';
+// isOauth
+		}
+		else{
 		$out .= '
 <form action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 <fieldset>
@@ -292,90 +373,6 @@ class Newsman extends Module
 	<br class="clear" />
 </fieldset>
 </form>';
-
-		/*HELPER FORM METHOD
-				$out .= $helper->generateForm(array(
-					array('form' => array(
-						'legend' => array(
-							'title' => $this->l('API Settings'),
-							'icon' => 'icon-cogs'
-						),
-						'input' => array(
-							array(
-								'type' => 'text',
-								'label' => $this->l('API KEY'),
-								'name' => 'api_key',
-								'size' => 40,
-								'required' => true
-							),
-							array(
-								'type' => 'text',
-								'label' => $this->l('User ID'),
-								'name' => 'user_id',
-								'size' => 40,
-								'required' => true
-							)
-						),
-						'buttons' => array(
-							array(
-								'title' => 'Connect',
-								'class' => 'pull-right',
-								'icon' => $connected ? 'process-icon-ok' : 'process-icon-next',
-								'js' => 'connectAPI(this)'
-							)
-						)
-					))));
-				HELPER FORM METHOD*/
-
-		/*HELPER FORM METHOD
-		$out .= '
-<form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
-	<br class="clear" />
-<div id="connectNewsmanMsg" class="conf" style="display:none;">Connected to newsman successfully.</div>
-	<div class="margin-form">
-	   <input type="submit" class="btn btn-default pull-right" name="submitOptionsconfiguration" value="' . $this->l('Connect') . '"><i class="process-icon-ok"></i></input>
-	</div>
-	<br class="clear" />
-</form>';
-		HELPER FORM METHOD*/
-
-		/*HELPER FORM METHOD
-		$out .= $helper->generateForm(array(array('form' => array(
-			'legend' => array(
-				'title' => $this->l('Synchronization mapping')
-			),
-			'input' => $mappingSection,
-			'buttons' => array(
-				array(
-					'title' => $this->l('Save mapping'),
-					'class' => 'pull-right',
-					'icon' => 'process-icon-save',
-					'js' => 'saveMapping(this)'
-				),
-				array(
-					'title' => $this->l('Refresh segments'),
-					'icon' => 'process-icon-refresh',
-					'js' => 'connectAPI(this)'
-				)
-			)
-		))));
-		HELPER FORM METHOD*/
-
-		/*HELPER FORM METHOD
-		$out .= '
-<form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
-<br class="clear" />
-	<div id="saveMappingMsg" class="conf" style="display:none;">Data has been mapped successfully for synchronization.</div>
-<div class="margin-form">
-  <input type="submit" class="btn btn-default pull-right" name="submitOptionsConfigurationRefresh" value="' . $this->l('Refresh Segments') . '"><i class="process-icon-ok"></i></input>
-	  <input type="submit" class="btn btn-default pull-right" name="submitSaveMapping" value="' . $this->l('Save mapping') . '"><i class="process-icon-ok"></i></input>
-	</div>
-	<br class="clear" />
-	<input type="hidden" name="HUserId" id="HUserId" class="" value="' . $this->userId . '" size="40" required="required">
-	<input type="hidden" name="hApi_key" id="hApi_key" class="" value="' . $this->apiKey . '" size="40" required="required">
-</form>';
-		HELPER FORM METHOD*/
-
 		$out .= '
 <form action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 <fieldset>
@@ -416,7 +413,6 @@ class Newsman extends Module
 				{
 					$mapOptions[$item['name']] = $_POST[$item['name']];
 				}
-
 				$out .= '<label for="sel_list">' . $this->l($item['label']) . '</label>
 	<div class="margin-form">
   <select name="' . $item['name'] . '" class="id-map-select fixed-width-xl" id="' . $item['name'] . '"></select>
@@ -439,61 +435,6 @@ class Newsman extends Module
 	<input type="hidden" name="hApi_key" id="hApi_key" class="" value="' . $this->apiKey . '" size="40" required="required">
 </fieldset>
 </form>';
-
-		//AUTOMATIC SYNCHRONIZATION
-
-		/*HELPER METHOD
-		$out .= $helper->generateForm(array(array('form' => array(
-			'legend' => array(
-				'title' => $this->l('Automatic synchronization')
-			),
-			'input' => array(
-				array(
-					'label' => 'Automatic synchronization',
-					'type' => 'select',
-					'name' => 'cron_option',
-					'options' => array(
-						'query' => array(
-							array('value' => '', 'label' => $this->l('never (disabled)')),
-							array('value' => 'd', 'label' => $this->l('every day')),
-							array('value' => 'w', 'label' => $this->l('every week')),
-						),
-						'id' => 'value',
-						'name' => 'label'
-					)
-				)
-			),
-			'buttons' => array(
-				array(
-					'title' => $this->l('Synchronize now'),
-					'icon' => 'process-icon-next',
-					'js' => 'synchronizeNow(this)'
-				),
-				array(
-					'title' => $this->l('Save option'),
-					'icon' => 'process-icon-save',
-					'class' => 'pull-right',
-					'js' => 'saveCron(this)'
-				),
-
-			)
-		))));
-		HELPER METHOD*/
-
-		/*HELPER METHOD
-		$out .= '
-<form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
-<br class="clear" />
-<div id="syncMsg" class="conf" style="display:none;">Users uploaded and scheduled for import. It might take a few minutes until they show up in your Newsman lists.</div>
-	<div class="margin-form">
-	  <input type="submit" class="btn btn-default" name="submitSynchronizeBtn" value="Synchronize now"/>
-	  <input type="submit" class="btn btn-default pull-right" name="submitSaveCronBtn" value="Save Options"/>
-	</div>
-	<br class="clear" />
-</form>';
-		HELPER METHOD*/
-
-
 		$out .= '
 <form name="autoSync" id="autoSync" action="' . Tools::safeOutput($_SERVER['REQUEST_URI']) . '" method="post" enctype="multipart/form-data">
 <fieldset>
@@ -523,6 +464,7 @@ class Newsman extends Module
 	<br class="clear" />
 </fieldset>
 </form>';
+	}
 
 		//the script
 
@@ -561,6 +503,154 @@ class Newsman extends Module
 		}
 
 		return $out;
+	}
+
+	public function isOauth(&$data, $checkOnlyIsOauth = false){
+		require 'Client.php';
+
+		$redirUri = urlencode("https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+		$redirUri = str_replace("amp%3B", "", $redirUri);
+		$data["oauthUrl"] = "https://newsman.app/admin/oauth/authorize?response_type=code&client_id=nzmplugin&nzmplugin=Opencart&scope=api&redirect_uri=" . $redirUri;
+
+		//oauth processing
+
+		$error = "";
+		$dataLists = array();
+		$data["oauthStep"] = 1;
+		$viewState = array();
+
+		if(!empty($_GET["error"])){
+			switch($error){
+				case "access_denied":
+					$error = "Access is denied";
+					break;
+				case "missing_lists":
+					$error = "There are no lists in your NewsMAN account";
+					break;
+			}
+		}else if(!empty($_GET["code"])){
+
+			$authUrl = "https://newsman.app/admin/oauth/token";
+
+			$code = $_GET["code"];
+
+			$redirect = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+			$body = array(
+				"grant_type" => "authorization_code",
+				"code" => $code,
+				"client_id" => "nzmplugin",
+				"redirect_uri" => $redirect
+			);
+
+			$ch = curl_init($authUrl);
+
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+
+			$response = curl_exec($ch);
+
+			if (curl_errno($ch)) {
+				$error .= 'cURL error: ' . curl_error($ch);
+			}
+
+			curl_close($ch);
+
+			if ($response !== false) {
+
+				$response = json_decode($response);
+
+				$data["creds"] = json_encode(array(
+					"newsman_userid" => $response->user_id,
+					"newsman_apikey" => $response->access_token
+					)
+				);
+
+				foreach($response->lists_data as $list => $l){
+					$dataLists[] = array(
+						"list_id" => $l->list_id,
+						"list_name" => $l->name
+					);
+				}	
+
+				$data["dataLists"] = $dataLists;
+
+				$data["oauthStep"] = 2;
+			} else {
+				$error .= "Error sending cURL request.";
+			}  
+		}
+
+		if(!empty($_POST["oauthstep2"]) && $_POST['oauthstep2'] == 'Y')
+		{
+			if(empty($_POST["newsman_list"]) || $_POST["newsman_list"] == 0)
+			{
+				$step = 1;
+			}
+			else
+			{
+				$creds = stripslashes($_POST["creds"]);
+				$creds = html_entity_decode($creds);
+				$creds = json_decode($creds, true);
+
+				$client = new Newsman_Client($creds["newsman_userid"], $creds["newsman_apikey"]);
+				$ret = $client->remarketing->getSettings($_POST["newsman_list"]);
+
+				$remarketingId = $ret["site_id"] . "-" . $ret["list_id"] . "-" . $ret["form_id"] . "-" . $ret["control_list_hash"];
+
+				//set feed
+				$url = "https://" . $_SERVER['SERVER_NAME'] . "/index.php?route=module/newsman_import&newsman=products.json&apikey=" . $creds["newsman_apikey"];		
+
+				try{
+					$ret = $client->feeds->setFeedOnList($_POST["newsman_list"], $url, $_SERVER['SERVER_NAME'], "NewsMAN");	
+				}
+				catch(Exception $ex)
+				{			
+					//the feed already exists
+				}
+
+				$settings = array();
+				$settings['list_id'] = $_POST["newsman_list"];
+				$settings['NEWSMAN_API_KEY'] = $creds["newsman_apikey"];
+				$settings['NEWSMAN_USER_ID'] = $creds["newsman_userid"];
+
+				Configuration::updateValue('NEWSMAN_API_KEY', $settings['NEWSMAN_API_KEY']);
+				Configuration::updateValue('NEWSMAN_USER_ID', $settings['NEWSMAN_USER_ID']);
+				Configuration::updateValue(
+					'NEWSMAN_DATA',
+					Tools::jsonEncode(array('lists' => $dataLists, 'segments' => array()))
+				);
+				$mapping = array(
+					"list" => $settings["list_id"]
+				);
+				$mapping = Tools::jsonEncode($mapping);
+				Configuration::updateValue('NEWSMAN_MAPPING', $mapping);
+
+				$settings = [
+					"analytics_newsmanremarketing" . '_register' => "newsmanremarketing",
+					"analytics_newsmanremarketing" . '_trackingid' => $remarketingId
+				];
+
+				$settingsStatus = [
+					'newsmanremarketing' . '_status' => 1
+				];
+
+				/*obsolete*/
+				/*$this->model_setting_setting->editSetting("analytics_newsmanremarketing", $settings);
+				$this->model_setting_setting->editSetting("newsmanremarketing", $settingsStatus);*/
+			}
+		}
+
+		$_apiKey = Configuration::get('NEWSMAN_API_KEY');
+
+		if(empty($_apiKey))
+		{
+			$data["isOauth"] = true;
+		}
+		else{
+			$data["isOauth"] = false;
+		}
 	}
 
 	private function jsonOut($output)
